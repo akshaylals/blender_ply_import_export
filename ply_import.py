@@ -5,6 +5,7 @@ bl_info = {
 }
 
 
+import os
 import bpy
 import bmesh
 # ImportHelper is a helper class, defines filename and
@@ -17,6 +18,7 @@ from plyfile import PlyData, PlyElement
 
 
 def read_some_data(context, filepath):
+    filename = os.path.split(filepath)[1]
     print("running read_some_data...")
     data = PlyData.read(filepath)
 
@@ -31,10 +33,28 @@ def read_some_data(context, filepath):
         bm.faces.new(face)
     
     me = bpy.data.meshes.new('placeholder_mesh')
-    mesh_obj = bpy.data.objects.new('ply', me)
+    mesh_obj = bpy.data.objects.new(filename, me)
     bpy.context.collection.objects.link(mesh_obj)
     bm.to_mesh(me)
     bm.free()
+
+    if all([ i in faces for i in ['red', 'green', 'blue', 'alpha']]):
+        materials = dict()
+        colors = [ (red, green, blue, alpha) for red, green, blue, alpha in faces[['red', 'green', 'blue', 'alpha']] ]
+        mat_i_counter = 0
+        for red, green, blue, alpha in colors:
+            color = (red, green, blue, alpha)
+            if not materials.get(color, False):
+                mat = bpy.data.materials.new(f'{filename}.material')
+                mat.use_nodes = True
+                mat.node_tree.nodes['Principled BSDF'].inputs["Base Color"].default_value = color
+
+                # set material to the object:
+                mesh_obj.data.materials.append(mat)
+                materials[color] = mat_i_counter
+                mat_i_counter += 1
+        for f, color in zip(me.polygons, colors):
+            f.material_index = materials[color]
 
     return {'FINISHED'}
 
