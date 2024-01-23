@@ -17,7 +17,7 @@ from bpy.types import Operator
 from plyfile import PlyData, PlyElement
 
 
-def read_some_data(context, filepath):
+def read_ply_data(context, filepath):
     filename = os.path.split(filepath)[1]
     print("running read_some_data...")
     data = PlyData.read(filepath)
@@ -60,8 +60,8 @@ def read_some_data(context, filepath):
 
 
 class ImportPLY(Operator, ImportHelper):
-    """This appears in the tooltip of the operator and in the generated docs"""
-    bl_idname = "import_ply.some_data"  # important since its how bpy.ops.import_test.some_data is constructed
+    """Load PLY file"""
+    bl_idname = "import_mesh.ply"  # important since its how bpy.ops.import_test.some_data is constructed
     bl_label = "Import PLY"
 
     # ImportHelper mixin class uses this
@@ -74,7 +74,7 @@ class ImportPLY(Operator, ImportHelper):
     )
 
     def execute(self, context):
-        return read_some_data(context, self.filepath)
+        return read_ply_data(context, self.filepath)
 
 
 # Only needed if you want to add into a dynamic menu.
@@ -97,4 +97,4 @@ if __name__ == "__main__":
     register()
 
     # test call
-    bpy.ops.import_ply.some_data('INVOKE_DEFAULT')
+    bpy.ops.import_mesh.ply('INVOKE_DEFAULT')

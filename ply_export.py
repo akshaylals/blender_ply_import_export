@@ -18,7 +18,7 @@ import numpy as np
 from plyfile import PlyData, PlyElement
 
 
-def write_some_data(context, filepath, format_ascii):
+def write_ply_data(context, filepath, format_ascii):
     obj = bpy.context.active_object
     mats = obj.data.materials
 
@@ -35,8 +35,8 @@ def write_some_data(context, filepath, format_ascii):
 
 
 class ExportPLY(Operator, ExportHelper):
-    """This appears in the tooltip of the operator and in the generated docs"""
-    bl_idname = "export_ply.some_data"  # important since its how bpy.ops.import_test.some_data is constructed
+    """Save PLY file"""
+    bl_idname = "export_mesh.ply"  # important since its how bpy.ops.import_test.some_data is constructed
     bl_label = "Export PLY file"
 
     # ExportHelper mixin class uses this
@@ -57,7 +57,7 @@ class ExportPLY(Operator, ExportHelper):
     )
 
     def execute(self, context):
-        return write_some_data(context, self.filepath, self.format_ascii)
+        return write_ply_data(context, self.filepath, self.format_ascii)
 
 
 # Only needed if you want to add into a dynamic menu
@@ -80,4 +80,4 @@ if __name__ == "__main__":
     register()
 
     # test call
-    bpy.ops.export_ply.some_data('INVOKE_DEFAULT')
+    bpy.ops.export_mesh.ply('INVOKE_DEFAULT')
