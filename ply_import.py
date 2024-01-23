@@ -1,10 +1,3 @@
-bl_info = {
-    "name": "Import PLY file",
-    "blender": (3, 6, 0),
-    "category": "Import-Export",
-}
-
-
 import os
 import bpy
 import bmesh
@@ -14,7 +7,7 @@ from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty
 from bpy.types import Operator
 
-from plyfile import PlyData, PlyElement
+from plyfile import PlyData
 
 
 def read_ply_data(context, filepath):
@@ -61,7 +54,7 @@ def read_ply_data(context, filepath):
 
 class ImportPLY(Operator, ImportHelper):
     """Load PLY file"""
-    bl_idname = "import_mesh.ply"  # important since its how bpy.ops.import_test.some_data is constructed
+    bl_idname = "import_mesh.ply"
     bl_label = "Import PLY"
 
     # ImportHelper mixin class uses this
@@ -77,24 +70,5 @@ class ImportPLY(Operator, ImportHelper):
         return read_ply_data(context, self.filepath)
 
 
-# Only needed if you want to add into a dynamic menu.
 def menu_func_import(self, context):
     self.layout.operator(ImportPLY.bl_idname, text="Import PLY")
-
-
-# Register and add to the "file selector" menu (required to use F3 search "Text Import Operator" for quick access).
-def register():
-    bpy.utils.register_class(ImportPLY)
-    bpy.types.TOPBAR_MT_file_import.append(menu_func_import)
-
-
-def unregister():
-    bpy.utils.unregister_class(ImportPLY)
-    bpy.types.TOPBAR_MT_file_import.remove(menu_func_import)
-
-
-if __name__ == "__main__":
-    register()
-
-    # test call
-    bpy.ops.import_mesh.ply('INVOKE_DEFAULT')

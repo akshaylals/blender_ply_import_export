@@ -1,13 +1,5 @@
-bl_info = {
-    "name": "Export PLY file",
-    "blender": (3, 6, 0),
-    "category": "Import-Export",
-}
-
-
 import os
 import bpy
-import bmesh
 # ExportHelper is a helper class, defines filename and
 # invoke() function which calls the file selector.
 from bpy_extras.io_utils import ExportHelper
@@ -36,7 +28,7 @@ def write_ply_data(context, filepath, format_ascii):
 
 class ExportPLY(Operator, ExportHelper):
     """Save PLY file"""
-    bl_idname = "export_mesh.ply"  # important since its how bpy.ops.import_test.some_data is constructed
+    bl_idname = "export_mesh.ply"
     bl_label = "Export PLY file"
 
     # ExportHelper mixin class uses this
@@ -48,8 +40,6 @@ class ExportPLY(Operator, ExportHelper):
         maxlen=255,  # Max internal buffer length, longer would be clamped.
     )
 
-    # List of operator properties, the attributes will be assigned
-    # to the class instance from the operator settings before calling.
     format_ascii: BoolProperty(
         name="ASCII",
         description="Exporting using ASCII file format, otherwise use binary format.",
@@ -60,24 +50,5 @@ class ExportPLY(Operator, ExportHelper):
         return write_ply_data(context, self.filepath, self.format_ascii)
 
 
-# Only needed if you want to add into a dynamic menu
 def menu_func_export(self, context):
     self.layout.operator(ExportPLY.bl_idname, text="Export PLY")
-
-
-# Register and add to the "file selector" menu (required to use F3 search "Text Export Operator" for quick access).
-def register():
-    bpy.utils.register_class(ExportPLY)
-    bpy.types.TOPBAR_MT_file_export.append(menu_func_export)
-
-
-def unregister():
-    bpy.utils.unregister_class(ExportPLY)
-    bpy.types.TOPBAR_MT_file_export.remove(menu_func_export)
-
-
-if __name__ == "__main__":
-    register()
-
-    # test call
-    bpy.ops.export_mesh.ply('INVOKE_DEFAULT')
