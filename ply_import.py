@@ -32,7 +32,7 @@ def read_some_data(context, filepath):
         face = [ verts[i] for i in face]
         bm.faces.new(face)
     
-    me = bpy.data.meshes.new('placeholder_mesh')
+    me = bpy.data.meshes.new(f'{filename}.mesh')
     mesh_obj = bpy.data.objects.new(filename, me)
     bpy.context.collection.objects.link(mesh_obj)
     bm.to_mesh(me)
@@ -47,7 +47,7 @@ def read_some_data(context, filepath):
             if not materials.get(color, False):
                 mat = bpy.data.materials.new(f'{filename}.material')
                 mat.use_nodes = True
-                mat.node_tree.nodes['Principled BSDF'].inputs["Base Color"].default_value = color
+                mat.node_tree.nodes['Principled BSDF'].inputs["Base Color"].default_value = [ i / 255 for i in color ]
 
                 # set material to the object:
                 mesh_obj.data.materials.append(mat)
