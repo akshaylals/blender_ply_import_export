@@ -11,19 +11,28 @@ import bmesh
 # ExportHelper is a helper class, defines filename and
 # invoke() function which calls the file selector.
 from bpy_extras.io_utils import ExportHelper
-from bpy.props import StringProperty, BoolProperty, EnumProperty
+from bpy.props import StringProperty, BoolProperty
 from bpy.types import Operator
 
+import numpy as np
 from plyfile import PlyData, PlyElement
 
 
 # int(round(0.44*255, 0))
 
-def write_some_data(context, filepath, use_some_setting):
-    print("running write_some_data...")
-    f = open(filepath, 'w', encoding='utf-8')
-    f.write("Hello World %s" % use_some_setting)
-    f.close()
+def write_some_data(context, filepath, format_ascii):
+    obj = bpy.context.active_object
+
+    vertices = [ (vertex.co.x, vertex.co.y, vertex.co.z, vertex.normal.x, vertex.normal.y, vertex.normal.z) for vertex in obj.data.vertices ]
+    faces = [ (tuple([ vertex for vertex in face.vertices ]), face.normal.x, face.normal.y, face.normal.z) for face in obj.data.polygons ]
+
+    # vertex = PlyElement.describe(np.array(vertices, dtype=[('x', 'f4'), ('y', 'f4'), ('z', 'f4'), ('nx', 'f4'), ('ny', 'f4'), ('nz', 'f4')]), 'vertex')
+    # face = PlyElement.describe(np.array(faces, dtype=[('vertex_indices', 'i4', (3,)), ('fx', 'f4'), ('fy', 'f4'), ('fz', 'f4')]), 'face')
+    vertex = PlyElement.describe(np.array(vertices, dtype=[('x', 'f4'), ('y', 'f4'), ('z', 'f4'), ('nx', 'f4'), ('ny', 'f4'), ('nz', 'f4')]), 'vertex')
+    face = PlyElement.describe(np.array(faces, dtype=[('vertex_indices', 'i4', (3,)), ('fx', 'f4'), ('fy', 'f4'), ('fz', 'f4')]), 'face')
+
+    with open(filepath, mode='wb') as f:
+        PlyData([vertex, face], text=format_ascii).write(f)
 
     return {'FINISHED'}
 
@@ -44,14 +53,14 @@ class ExportPLY(Operator, ExportHelper):
 
     # List of operator properties, the attributes will be assigned
     # to the class instance from the operator settings before calling.
-    format: BoolProperty(
-        name="Format",
+    format_ascii: BoolProperty(
+        name="ASCII",
         description="Exporting using ASCII file format, otherwise use binary format.",
         default=True,
     )
 
     def execute(self, context):
-        return write_some_data(context, self.filepath, self.format)
+        return write_some_data(context, self.filepath, self.format_ascii)
 
 
 # Only needed if you want to add into a dynamic menu
