@@ -21,9 +21,15 @@ def read_ply_data(context, filepath):
     bm = bmesh.new()
     verts = [bm.verts.new(v) for v in vertices[['x', 'y', 'z']]]
 
-    for face in faces['vertex_indices']:
-        face = [ verts[i] for i in face]
-        bm.faces.new(face)
+    skip_i = []
+
+    for i, face in enumerate(faces['vertex_indices']):
+        face = [ verts[j] for j in face ]
+        try:
+            bm.faces.new(face)
+        except ValueError:
+            skip_i.append(i)
+            continue
     
     me = bpy.data.meshes.new(f'{filename}.mesh')
     mesh_obj = bpy.data.objects.new(filename, me)
@@ -33,7 +39,7 @@ def read_ply_data(context, filepath):
 
     if all([ i in faces for i in ['red', 'green', 'blue', 'alpha']]):
         materials = dict()
-        colors = [ (red, green, blue, alpha) for red, green, blue, alpha in faces[['red', 'green', 'blue', 'alpha']] ]
+        colors = [ (red, green, blue, alpha) for i, (red, green, blue, alpha) in enumerate(faces[['red', 'green', 'blue', 'alpha']]) if i not in skip_i ]
         mat_i_counter = 0
         for red, green, blue, alpha in colors:
             color = (red, green, blue, alpha)

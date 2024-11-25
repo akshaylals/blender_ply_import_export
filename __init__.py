@@ -1,8 +1,8 @@
 bl_info = {
     "name": "Import and Export PLY file with face colors",
     "author": "Akshaylal S",
-    "version": (1, 0, 0),
-    "blender": (3, 6, 0),
+    "version": (1, 1, 0),
+    "blender": (4, 0, 0),
     "location": "File > Import-Export",
     "category": "Import-Export",
 }
